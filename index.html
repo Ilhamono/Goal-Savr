@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goal Savr - Multi-Goal Savings Planner</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #50e3c2;
+            --background-color: rgba(176, 224, 230, 1);
+            --text-color: #333;
+            --card-background: rgba(245, 245, 220, 1);
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: var(--card-background);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            text-align: center;
+            color: var(--primary-color);
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        h2 {
+            font-size: 1.8em;
+            margin-top: 30px;
+        }
+        .savings-goal {
+            background: var(--card-background);
+            border: 1px solid #e0e0e0;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        .savings-goal:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .progress-bar {
+            position: relative;
+            background-color: #e0e0e0;
+            height: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        .progress {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            height: 100%;
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.5s ease-in-out;
+        }
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #333;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.7);
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 15px;
+            background: var(--primary-color);
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background 0.3s ease;
+            font-weight: bold;
+        }
+        .button:hover {
+            background: var(--secondary-color);
+        }
+        #initialForm, #savingsPlannerSection {
+            margin-top: 30px;
+        }
+        input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
+        }
+        .goal-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .goal-actions {
+            display: flex;
+            justify-content: flex-end;
+        }
+        .icon-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2em;
+            color: var(--primary-color);
+            margin-left: 10px;
+            transition: color 0.3s ease;
+        }
+        .icon-button:hover {
+            color: var(--secondary-color);
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: var(--primary-color);
+            color: #fff;
+            margin-top: 50px;
+            border-radius: 0 0 10px 10px;
+        }
+        footer p {
+            margin: 0;
+        }
+        footer .social-icons {
+            margin-top: 10px;
+        }
+        footer .social-icons a {
+            color: #fff;
+            font-size: 1.5em;
+            margin: 0 10px;
+            transition: color 0.3s ease;
+        }
+        footer .social-icons a:hover {
+            color: var(--secondary-color);
+        }
+        .congratulations {
+            background: linear-gradient(45deg, rgba(74, 144, 226, 0.5) 0%, #fad0c4 99%, #fad0c4 100%);
+            color: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            animation: pop-in 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards,
+                       sparkle 1.5s ease-in-out infinite;
+            transform: scale(0);
+            opacity: 0;
+        }
+        @keyframes pop-in {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            80% {
+                transform: scale(1.1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        @keyframes sparkle {
+            0%, 100% {
+                box-shadow: 0 0 0 rgba(255, 223, 0, 0.5),
+                            0 0 0 rgba(255, 223, 0, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(255, 223, 0, 0.5),
+                            0 0 40px rgba(255, 223, 0, 0.5);
+            }
+        }
+        .congratulations h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #4a4a4a;
+        }
+        .congratulations p {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+        }
+        .congratulations .emoji {
+            font-size: 2em;
+            margin: 10px 0;
+            animation: bounce 0.6s ease-in-out infinite alternate;
+        }
+        @keyframes bounce {
+            from {
+                transform: translateY(0);
+            }
+            to {
+                transform: translateY(-10px);
+            }
+        }
+        
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #00c6ff 0%, #0072ff 99%, #ffffff 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+        }
+
+        .loading-content {
+            text-align: center;
+            position: relative;
+        }
+
+        .piggy-bank {
+            width: 200px;
+            height: 160px;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            background: rgb(104, 130, 185);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .piggy-bank::before {
+            content: '';
+            position: absolute;
+            top: 25%;
+            left: 5%;
+            width: 30px;
+            height: 30px;
+            background: #fff9;
+            border-radius: 50%;
+            box-shadow: 110px 0 0 #fff9;
+        }
+
+        .piggy-bank::after {
+            content: '';
+            position: absolute;
+            bottom: 15%;
+            left: 50%;
+            width: 40px;
+            height: 20px;
+            background: #fff9;
+            border-radius: 50% 50% 0 0;
+            transform: translateX(-50%);
+        }
+
+        .coin {
+            width: 40px;
+            height: 40px;
+            background: gold;
+            border-radius: 50%;
+            position: absolute;
+            top: -50px;
+            left: calc(50% - 20px);
+            animation: drop 1.5s ease-in infinite;
+        }
+
+        .coin::before {
+            content: '$';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffdb58;
+        }
+
+        @keyframes drop {
+            0% { top: -50px; transform: scale(1) rotate(0deg); }
+            20% { transform: scale(1.1) rotate(45deg); }
+            100% { top: 120px; transform: scale(0.7) rotate(90deg); opacity: 0; }
+        }
+
+        .loading-text {
+            margin-top: 30px;
+            font-size: 36px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .loading-text span {
+            display: inline-block;
+            animation: bounce 0.3s ease infinite alternate;
+        }
+
+        .loading-text span:nth-child(2) { animation-delay: 0.1s; }
+        .loading-text span:nth-child(3) { animation-delay: 0.2s; }
+        .loading-text span:nth-child(4) { animation-delay: 0.3s; }
+        .loading-text span:nth-child(5) { animation-delay: 0.4s; }
+        .loading-text span:nth-child(6) { animation-delay: 0.5s; }
+        .loading-text span:nth-child(7) { animation-delay: 0.6s; }
+        .loading-text span:nth-child(8) { animation-delay: 0.7s; }
+        .loading-text span:nth-child(9) { animation-delay: 0.8s; }
+
+        @keyframes bounce {
+            100% { transform: translateY(-10px); }
+        }
+
+        .fade-out {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+    </style>
+</head>
+<body>
+  
+<!-- New Vibrant Loading Screen -->
+    <div id="loading-screen">
+        <div class="loading-content">
+            <div class="piggy-bank">
+                <div class="coin"></div>
+            </div>
+            <div class="loading-text">
+                <span>G</span><span>O</span><span>A</span><span>L</span>
+                <span>S</span><span>A</span><span>V</span><span>R</span>
+            </div>
+        </div>
+    </div>
+  
+    <div class="container">
+        <h1>Goal Savr</h1>
+        <h4 style="text-align: center;">Yuk Lihat Progresnya di sini </h4>
+        <div id="initialForm">
+            <h2>Masukkan Tujuan Anda</h2>
+            <input type="text" id="dreamTitle" placeholder="Nama Barang/Sesuatu">
+            <input type="number" id="targetAmount" placeholder="Harga Barang">
+            <input type="number" id="savingsAmount" placeholder="Jumlah Menabung">
+            <button class="button" onclick="submitDream()">
+                <i class="fas fa-plus"></i> Tambah Impian
+            </button>
+        </div>
+        <div id="savingsPlannerSection">
+            <div id="savingsGoals"></div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>&copy; 2024 Goal Savr | IAM</p>
+        <div class="social-icons">
+            <a href="https://www.instagram.com/ilham_ono" target="_blank">
+                <i class="fab fa-instagram"></i></a>
+            <a href="https://github.com/Ilhamono"><i class="fab fa-github"></i></a>
+        </div>
+    </footer>
+
+    <script>
+        let goals = [];
+        
+        
+
+        function loadGoals() {
+            const savedGoals = localStorage.getItem('savingsGoals');
+            if (savedGoals) {
+                goals = JSON.parse(savedGoals);
+                updateGoals();
+            }
+        }
+
+        function saveGoals() {
+            localStorage.setItem('savingsGoals', JSON.stringify(goals));
+        }
+
+        function submitDream() {
+            const title = document.getElementById('dreamTitle').value;
+            const target = parseFloat(document.getElementById('targetAmount').value);
+            const savings = parseFloat(document.getElementById('savingsAmount').value);
+            
+            if (title && !isNaN(target) && !isNaN(savings)) {
+                const newGoal = {
+                    id: Date.now(),
+                    title: title,
+                    target: target,
+                    current: 0,
+                    savings: savings
+                };
+                goals.push(newGoal);
+                updateGoals();
+                saveGoals();
+                clearForm();
+            } else {
+                alert('Mohon isi semua field dengan benar.');
+            }
+        }
+
+        function clearForm() {
+            document.getElementById('dreamTitle').value = '';
+            document.getElementById('targetAmount').value = '';
+            document.getElementById('savingsAmount').value = '';
+        }
+
+        function updateGoals() {
+            const goalsContainer = document.getElementById('savingsGoals');
+            goalsContainer.innerHTML = '';
+            goals.forEach(goal => {
+                const percentage = (goal.current / goal.target) * 100;
+                const goalElement = document.createElement('div');
+                goalElement.className = 'savings-goal';
+                goalElement.innerHTML = `
+                    <h2>${goal.title}</h2>
+                    <div class="goal-info">
+                        <span>Target: Rp ${goal.target.toLocaleString()}</span>
+                        <span>Current: Rp ${goal.current.toLocaleString()}</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: ${percentage}%"></div>
+                        <span class="progress-text">${percentage.toFixed(2)}%</span>
+                    </div>
+                    <div class="goal-actions">
+                        <button class="icon-button" onclick="handleSave(${goal.id})" title="Menabung">
+                            <i class="fas fa-piggy-bank"></i>
+                        </button>
+                        <button class="icon-button" onclick="handleWithdraw(${goal.id})" title="Ambil">
+                            <i class="fas fa-hand-holding-usd"></i>
+                        </button>
+                        <button class="icon-button" onclick="deleteGoal(${goal.id})" title="Hapus">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                    ${goal.current >= goal.target ? `
+                        <div class="congratulations">
+                            <h3>Selamat!</h3>
+                            <p>Anda telah mencapai target tabungan Anda untuk "${goal.title}"!</p>
+                            <div class="emoji">🎉🏆💰</div>
+                        </div>
+                    ` : ''}
+                `;
+                goalsContainer.appendChild(goalElement);
+            });
+        }
+
+        function handleSave(id) {
+            const goal = goals.find(g => g.id === id);
+            if (goal) {
+                const newCurrent = Math.min(goal.current + goal.savings, goal.target);
+                goal.current = newCurrent;
+                updateGoals();
+                saveGoals();
+                if (newCurrent === goal.target) {
+                    const goalElement = document.querySelector(`.savings-goal:has([onclick="handleSave(${id})"])`);
+                    const congratsElement = goalElement.querySelector('.congratulations');
+                    congratsElement.style.display = 'block';
+                    setTimeout(() => {
+                        congratsElement.style.animation = 'none';
+                        congratsElement.offsetHeight; // Trigger reflow
+                        congratsElement.style.animation = null;
+                    }, 100);
+                }
+            }
+        }
+
+        function handleWithdraw(id) {
+            const goal = goals.find(g => g.id === id);
+            if (goal) {
+                goal.current = Math.max(0, goal.current - goal.savings);
+                updateGoals();
+                saveGoals();
+            }
+        }
+
+        function deleteGoal(id) {
+            goals = goals.filter(g => g.id !== id);
+            updateGoals();
+            saveGoals();
+        }
+
+        window.onload = loadGoals;
+        
+        // Existing JavaScript...
+
+        // New Vibrant Loading Screen JavaScript
+        window.addEventListener('load', function() {
+            const loadingScreen = document.getElementById('loading-screen');
+            const loadingText = document.querySelector('.loading-text');
+            
+            // Animate each letter of GOAL SAVR
+            loadingText.innerHTML = loadingText.textContent.replace(/\S/g, "<span>$&</span>");
+            
+            setTimeout(function() {
+                loadingScreen.classList.add('fade-out');
+                setTimeout(function() {
+                    loadingScreen.style.display = 'none';
+                }, 500);
+            }, 3000); // Show loading screen for 3 seconds
+        });
+    </script>
+</body>
+</html>
