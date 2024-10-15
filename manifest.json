@@ -1,0 +1,20 @@
+{
+  "name": "Goal Savr",
+  "short_name": "Goal Savr",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#b0e0e6",
+  "theme_color": "#4a90e2",
+  "icons": [
+    {
+      "src": "00.jpg",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "00.jpg",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
