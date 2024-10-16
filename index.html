@@ -519,6 +519,55 @@
                 }, 500);
             }, 3000); // Show loading screen for 3 seconds
         });
+
+        // Register service worker
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+        .then(function(reg) {
+            console.log('Service Worker Registered!', reg);
+        })
+        .catch(function(err) {
+            console.error('Service Worker registration failed:', err);
+        });
+}
+
+// Fungsi untuk menampilkan notifikasi
+function showNotification() {
+    if (Notification.permission === 'granted') {
+        navigator.serviceWorker.ready.then(function(registration) {
+            registration.showNotification('Reminder: Jangan lupa menabung hari ini!😊❤️');
+        });
+    }
+}
+
+// Cek apakah notifikasi diizinkan, jika belum, minta izin
+if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
+    Notification.requestPermission().then(function(permission) {
+        if (permission === 'granted') {
+            showNotification();
+        }
+    });
+}
+
+// Fungsi untuk menjadwalkan notifikasi harian
+function scheduleDailyNotification() {
+    let lastNotification = localStorage.getItem('lastNotification');
+    let currentTime = new Date().getTime();
+
+    if (!lastNotification || currentTime - lastNotification >= 24 * 60 * 60 * 1000) {
+        // Tampilkan notifikasi dan simpan waktu terakhir notifikasi
+        showNotification();
+        localStorage.setItem('lastNotification', currentTime);
+    }
+
+    // Set timeout untuk mengecek lagi dalam 24 jam
+    setTimeout(scheduleDailyNotification, 24 * 60 * 60 * 1000);
+}
+
+// Jalankan notifikasi harian setelah halaman dimuat
+window.addEventListener('load', function() {
+    scheduleDailyNotification();
+});
     </script>
 </body>
 </html>
