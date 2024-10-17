@@ -535,7 +535,7 @@ if ('serviceWorker' in navigator) {
 function showNotification() {
     if (Notification.permission === 'granted') {
         navigator.serviceWorker.ready.then(function(registration) {
-            registration.showNotification('Reminder: Jangan lupa menabung hari ini!😊❤️');
+            registration.showNotification('Reminder: Jangan lupa menabung hari ini!');
         });
     }
 }
