@@ -9,7 +9,7 @@ self.addEventListener('activate', function(event) {
 self.addEventListener('push', function(event) {
     const options = {
         body: event.data ? event.data.text() : 'Time to check your savings goal!',
-        icon: '00.jpg',
+        icon: 'a.png',
         vibrate: [100, 50, 100],
         data: {
             dateOfArrival: Date.now(),
