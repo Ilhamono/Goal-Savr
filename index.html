@@ -222,7 +222,7 @@
                 transform: translateY(-10px);
             }
         }
-        
+
         #loading-screen {
             position: fixed;
             top: 0;
@@ -336,11 +336,168 @@
             opacity: 0;
             visibility: hidden;
         }
-        
+
+        /* New styles for the navbar */
+        .navbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--primary-color);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .nav-item {
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item i {
+            font-size: 1.5em;
+            margin-bottom: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item span {
+            font-size: 0.8em;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover i {
+            transform: translateY(-5px);
+        }
+
+        .nav-item:hover span {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .nav-item.active {
+            color: var(--secondary-color);
+        }
+
+        /* Adjust container padding to account for navbar */
+        .container {
+            padding-bottom: 80px;
+        }
+
+        /* Adjust footer to be above navbar */
+        footer {
+            margin-bottom: 60px;
+        }
+
+        /* Styles for the home page */
+        #home-page {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .welcome-section h2 {
+            color: var(--primary-color);
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .quick-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background-color: var(--card-background);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            flex: 1;
+            margin: 0 10px;
+            transition: transform 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card i {
+            font-size: 2em;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--text-color);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .recent-goals {
+            margin-bottom: 30px;
+        }
+
+        .recent-goals h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .quick-actions {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+        }
+
+        .action-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 500px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .action-button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .motivation-quote {
+            text-align: center;
+            font-style: italic;
+            color: #666;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
-  
+
 <!-- New Vibrant Loading Screen -->
     <div id="loading-screen">
         <div class="loading-content">
@@ -353,24 +510,73 @@
             </div>
         </div>
     </div>
-  
+
     <div class="container">
         <h1>Goal Savr</h1>
         <h4 style="text-align: center;">Yuk Lihat Progresnya di sini </h4>
-        <div id="initialForm">
-            <h2>Masukkan Tujuan Anda</h2>
-            <input type="text" id="dreamTitle" placeholder="Nama Barang/Sesuatu">
-            <input type="number" id="targetAmount" placeholder="Harga Barang">
-            <input type="number" id="savingsAmount" placeholder="Jumlah Menabung">
-            <button class="button" onclick="submitDream()">
-                <i class="fas fa-plus"></i> Tambah Impian
-            </button>
+        
+        <!-- Home Page -->
+        <div id="home-page" class="page active">
+            <div class="welcome-section">
+                <h2>Selamat Datang di Goal Savr!</h2>
+                <p>Mulai wujudkan impianmu hari ini.</p>
+            </div>
+            
+            <div class="quick-stats">
+                <div class="stat-card">
+                    <i class="fas fa-piggy-bank"></i>
+                    <span class="stat-value" id="totalSavings">Rp 0</span>
+                    <span class="stat-label">Total Tabungan</span>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-bullseye"></i>
+                    <span class="stat-value" id="activeGoals">0</span>
+                    <span class="stat-label">Tujuan Aktif</span>
+                </div>
+            </div>
+            
+            <div class="recent-goals">
+                <h3>Tujuan Terbaru</h3>
+                <div id="recentGoalsList">
+                    <!-- Goals will be dynamically inserted here -->
+                </div>
+            </div>
+            
+            <div class="quick-actions">
+                <button class="action-button" onclick="showAddGoalForm()">
+                    <i class="fas fa-plus"></i> Tambah Tujuan Baru
+                </button>
+                <button class="action-button" onclick="showAllGoals()">
+                    <i class="fas fa-list"></i> Lihat Semua Tujuan
+                </button>
+            </div>
+            
+            <div class="motivation-quote">
+                <p id="quoteText">"Menabung adalah kunci untuk meraih impianmu."</p>
+            </div>
         </div>
-        <div id="savingsPlannerSection">
-            <div id="savingsGoals"></div>
+
+        <!-- Add Goal Form -->
+        <div id="add-goal-page" class="page">
+            <div id="initialForm">
+                <h2>Masukkan Tujuan Anda</h2>
+                <input type="text" id="dreamTitle" placeholder="Nama Barang/Sesuatu">
+                <input type="number" id="targetAmount" placeholder="Harga Barang">
+                <input type="number" id="savingsAmount" placeholder="Jumlah Menabung">
+                <button class="button" onclick="submitDream()">
+                    <i class="fas fa-plus"></i> Tambah Impian
+                </button>
+            </div>
+        </div>
+
+        <!-- All Goals Page -->
+        <div id="all-goals-page" class="page">
+            <div id="savingsPlannerSection">
+                <div id="savingsGoals"></div>
+            </div>
         </div>
     </div>
-    
+
     <footer>
         <p>&copy; 2024 Goal Savr | IAM</p>
         <div class="social-icons">
@@ -380,16 +586,35 @@
         </div>
     </footer>
 
+    <!-- New navbar -->
+    <nav class="navbar">
+        <a href="#" class="nav-item active" onclick="showPage('home-page')">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="#" class="nav-item" onclick="showPage('add-goal-page')">
+            <i class="fas fa-plus-circle"></i>
+            <span>Add Goal</span>
+        </a>
+        <a href="#" class="nav-item" onclick="showPage('all-goals-page')">
+            <i class="fas fa-list"></i>
+            <span>All Goals</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </a>
+    </nav>
+
     <script>
         let goals = [];
-        
-        
 
         function loadGoals() {
             const savedGoals = localStorage.getItem('savingsGoals');
             if (savedGoals) {
                 goals = JSON.parse(savedGoals);
                 updateGoals();
+                updateHomeStats();
             }
         }
 
@@ -401,7 +626,7 @@
             const title = document.getElementById('dreamTitle').value;
             const target = parseFloat(document.getElementById('targetAmount').value);
             const savings = parseFloat(document.getElementById('savingsAmount').value);
-            
+
             if (title && !isNaN(target) && !isNaN(savings)) {
                 const newGoal = {
                     id: Date.now(),
@@ -412,8 +637,10 @@
                 };
                 goals.push(newGoal);
                 updateGoals();
+                updateHomeStats();
                 saveGoals();
                 clearForm();
+                showPage('home-page');
             } else {
                 alert('Mohon isi semua field dengan benar.');
             }
@@ -471,6 +698,7 @@
                 const newCurrent = Math.min(goal.current + goal.savings, goal.target);
                 goal.current = newCurrent;
                 updateGoals();
+                updateHomeStats();
                 saveGoals();
                 if (newCurrent === goal.target) {
                     const goalElement = document.querySelector(`.savings-goal:has([onclick="handleSave(${id})"])`);
@@ -490,6 +718,7 @@
             if (goal) {
                 goal.current = Math.max(0, goal.current - goal.savings);
                 updateGoals();
+                updateHomeStats();
                 saveGoals();
             }
         }
@@ -497,77 +726,104 @@
         function deleteGoal(id) {
             goals = goals.filter(g => g.id !== id);
             updateGoals();
+            updateHomeStats();
             saveGoals();
         }
 
-        window.onload = loadGoals;
-        
-        // Existing JavaScript...
+        function updateHomeStats() {
+            const totalSavings = goals.reduce((sum, goal) => sum + goal.current, 0);
+            document.getElementById('totalSavings').textContent = `Rp ${totalSavings.toLocaleString()}`;
+            document.getElementById('activeGoals').textContent = goals.length;
 
-        // New Vibrant Loading Screen JavaScript
-        window.addEventListener('load', function() {
+            const recentGoalsList = document.getElementById('recentGoalsList');
+            recentGoalsList.innerHTML = '';
+            goals.slice(0, 3).forEach(goal => {
+                const goalElement = document.createElement('div');
+                goalElement.className = 'recent-goal-item';
+                goalElement.innerHTML = `
+                    <h4>${goal.title}</h4>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: ${(goal.current / goal.target) * 100}%"></div>
+                    </div>
+                    <span>${((goal.current / goal.target) * 100).toFixed(2)}% tercapai</span>
+                `;
+                recentGoalsList.appendChild(goalElement);
+            });
+        }
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            document.querySelector(`.nav-item[onclick="showPage('${pageId}')"]`).classList.add('active');
+        }
+
+        function showAddGoalForm() {
+            showPage('add-goal-page');
+        }
+
+        function showAllGoals() {
+            showPage('all-goals-page');
+        }
+
+        window.onload = function() {
+            loadGoals();
             const loadingScreen = document.getElementById('loading-screen');
             const loadingText = document.querySelector('.loading-text');
-            
-            // Animate each letter of GOAL SAVR
+
             loadingText.innerHTML = loadingText.textContent.replace(/\S/g, "<span>$&</span>");
-            
+
             setTimeout(function() {
                 loadingScreen.classList.add('fade-out');
                 setTimeout(function() {
                     loadingScreen.style.display = 'none';
                 }, 500);
-            }, 3000); // Show loading screen for 3 seconds
-        });
+            }, 3000);
+        };
 
         // Register service worker
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js')
-        .then(function(reg) {
-            console.log('Service Worker Registered!', reg);
-        })
-        .catch(function(err) {
-            console.error('Service Worker registration failed:', err);
-        });
-}
-
-// Fungsi untuk menampilkan notifikasi
-function showNotification() {
-    if (Notification.permission === 'granted') {
-        navigator.serviceWorker.ready.then(function(registration) {
-            registration.showNotification('Reminder: Jangan lupa menabung hari ini!');
-        });
-    }
-}
-
-// Cek apakah notifikasi diizinkan, jika belum, minta izin
-if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
-    Notification.requestPermission().then(function(permission) {
-        if (permission === 'granted') {
-            showNotification();
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(function(reg) {
+                    console.log('Service Worker Registered!', reg);
+                })
+                .catch(function(err) {
+                    console.error('Service Worker registration failed:', err);
+                });
         }
-    });
-}
 
-// Fungsi untuk menjadwalkan notifikasi harian
-function scheduleDailyNotification() {
-    let lastNotification = localStorage.getItem('lastNotification');
-    let currentTime = new Date().getTime();
+        function showNotification() {
+            if (Notification.permission === 'granted') {
+                navigator.serviceWorker.ready.then(function(registration) {
+                    registration.showNotification('Reminder: Jangan lupa menabung hari ini!');
+                });
+            }
+        }
 
-    if (!lastNotification || currentTime - lastNotification >= 24 * 60 * 60 * 1000) {
-        // Tampilkan notifikasi dan simpan waktu terakhir notifikasi
-        showNotification();
-        localStorage.setItem('lastNotification', currentTime);
-    }
+        if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
+            Notification.requestPermission().then(function(permission) {
+                if (permission === 'granted') {
+                    showNotification();
+                }
+            });
+        }
 
-    // Set timeout untuk mengecek lagi dalam 24 jam
-    setTimeout(scheduleDailyNotification, 24 * 60 * 60 * 1000);
-}
+        function scheduleDailyNotification() {
+            let lastNotification = localStorage.getItem('lastNotification');
+            let currentTime = new Date().getTime();
 
-// Jalankan notifikasi harian setelah halaman dimuat
-window.addEventListener('load', function() {
-    scheduleDailyNotification();
-});
+            if (!lastNotification || currentTime - lastNotification >= 24 * 60 * 60 * 1000) {
+                showNotification();
+                localStorage.setItem('lastNotification', currentTime);
+            }
+
+            setTimeout(scheduleDailyNotification, 24 * 60 * 60 * 1000);
+        }
+
+        window.addEventListener('load', function() {
+            scheduleDailyNotification();
+        });
     </script>
 </body>
 </html>
